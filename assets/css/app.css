@@ -1,0 +1,105 @@
+/* Global styles extracted from PHP inline CSS */
+html, body { height: 100%; }
+body { background-color: #fafafa; min-height: 100vh; display: flex; flex-direction: column; }
+main.container { flex: 1 0 auto; }
+footer { margin-top: auto; }
+.navbar-rr { background: linear-gradient(135deg,#5A3E2B,#3E2A1F); position: relative; z-index: 3; }
+
+/* Header brand */
+.brand-logo-tilt { border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.2); transform:rotate(-6deg); }
+.brand-title { letter-spacing:.5px; font-weight:700; }
+
+/* Login page slideshow */
+.bbq-slideshow { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+.bbq-slideshow .slide {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center; opacity: 0;
+  transform: scale(1.05);
+  animation: bbqFade 36s infinite ease-in-out;
+}
+.bbq-slideshow .slide:nth-child(1) { animation-delay: 0s; }
+.bbq-slideshow .slide:nth-child(2) { animation-delay: 6s; }
+.bbq-slideshow .slide:nth-child(3) { animation-delay: 12s; }
+.bbq-slideshow .slide:nth-child(4) { animation-delay: 18s; }
+.bbq-slideshow .slide:nth-child(5) { animation-delay: 24s; }
+.bbq-slideshow .slide:nth-child(6) { animation-delay: 30s; }
+@keyframes bbqFade {
+  0% { opacity: 0; transform: scale(1.05); }
+  5% { opacity: .9; transform: scale(1.02); }
+  25% { opacity: .9; transform: scale(1.0); }
+  30% { opacity: 0; transform: scale(1.0); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+/* Specific slides (relative URLs from assets/css/) */
+.bbq-slideshow .slide-1 { background-image:url('../SlideShowBarbecue/1.jpg'); }
+.bbq-slideshow .slide-2 { background-image:url('../SlideShowBarbecue/2.jpg'); }
+.bbq-slideshow .slide-3 { background-image:url('../SlideShowBarbecue/3.jpg'); }
+.bbq-slideshow .slide-4 { background-image:url('../SlideShowBarbecue/4.jpg'); }
+.bbq-slideshow .slide-5 { background-image:url('../SlideShowBarbecue/5.jpg'); }
+.bbq-slideshow .slide-6 { background-image:url('../SlideShowBarbecue/6.jpg'); }
+
+/* Login/register cards */
+.bbq-bg {
+  background: transparent;
+  border-radius: 16px;
+  position: relative; z-index: 1;
+  box-shadow: none;
+}
+.bbq-card { background: #ffffff; border: 1px solid #f0e2d6; }
+.bbq-title { letter-spacing:.5px; font-weight:800; }
+.bbq-badge { background: #fdebd2; color:#6b3a1e; border-radius:999px; padding:.25rem .6rem; font-size:.8rem; }
+.input-icon { position: relative; }
+.input-icon .bi { position:absolute; left:.75rem; top:50%; transform:translateY(-50%); color:#9a7b68; }
+.input-icon input { padding-left:2.2rem; }
+.divider { display:flex; align-items:center; gap:.75rem; color:#8b7767; }
+.divider::before, .divider::after { content:""; flex:1; height:1px; background:linear-gradient(90deg, transparent, #e5d5c7, transparent); }
+.logo-tilt { border-radius:12px; box-shadow:0 8px 24px rgba(0,0,0,.15); transform:rotate(-6deg); }
+.logo-tilt-sm { border-radius:12px; box-shadow:0 4px 14px rgba(0,0,0,.22); transform:rotate(-6deg) translateY(-1px); }
+.title-strong { letter-spacing:.5px; font-weight:800; }
+.bbq-overlay { position: fixed; inset: 0; background: radial-gradient(circle at 20% 10%, rgba(0,0,0,.25), transparent 40%), linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)); z-index: -1; }
+
+/* Utility for small provider icons */
+.google-icon { vertical-align:-3px; margin-right:6px; }
+
+/* Admin layout */
+.admin-layout { display:flex; gap:1rem; }
+.admin-sidebar {
+  width: 240px;
+  flex: 0 0 240px;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 1rem;
+  height: 100%;
+}
+.admin-sidebar .nav-link { color:#5a4639; border-radius:8px; }
+.admin-sidebar .nav-link.active, .admin-sidebar .nav-link:hover { background:#f6efe9; color:#2e221b; }
+.admin-content { flex: 1 1 auto; }
+
+/* Inventory thumbnails */
+.thumb-item { width: 64px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #e7e2de; }
+
+/* Inventory thumbnails */
+.item-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 6px; }
+
+/* Footer spacing */
+.footer-spacer { height: 48px; }
+
+/* Back button on queue page */
+.rr-back-btn {
+  color: #212529 !important;
+  border-color: #6c757d;
+  background-color: transparent;
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.rr-back-btn:hover {
+  color: #000 !important;
+  background-color: #6f4e37;
+  border-color: #6f4e37;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,.08);
+}
+.rr-back-btn:active {
+  transform: translateX(-1px) translateY(1px);
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
