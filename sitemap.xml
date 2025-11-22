@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://roastrack.wasmer.app/</loc></url>
+  <url><loc>https://roastrack.wasmer.app/catalog.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/login.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/register.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/my_orders.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/cart_checkout.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/queue.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/admin/login.php</loc></url>
+  <url><loc>https://roastrack.wasmer.app/admin/register.php</loc></url>
+</urlset>
