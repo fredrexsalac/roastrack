@@ -31,24 +31,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
   $role = $_POST['role'] ?? $role;
   if (!in_array($role, $modes, true)) { $role = 'staff'; }
 
+  error_log("Admin register POST: username='$username', full_name='$full_name', phone='$phone', role='$role'");
+
   if ($username === '' || $password === '' || $full_name === '' || $phone === ''){
     $error = 'Full name, phone, username, and password are required.';
+    error_log("Validation error: $error");
   } else {
     try {
       $stmt = $pdo->prepare('SELECT id FROM users WHERE username = ?');
       $stmt->execute([$username]);
       if ($stmt->fetch()){
         $error = 'Username already exists.';
+        error_log("Username already exists: $username");
       } else {
         $hash = password_hash($password, PASSWORD_DEFAULT);
+        error_log("Creating user: username='$username', role='$role', hash='$hash'");
         $ins = $pdo->prepare('INSERT INTO users (username, password_hash, role, full_name, phone, email) VALUES (?,?,?,?,?,?)');
         $ins->execute([$username, $hash, $role, $full_name, $phone, $email ?: null]);
-        $_SESSION['user'] = [ 'id'=>$pdo->lastInsertId(), 'username'=>$username, 'role'=>$role, 'full_name'=>$full_name, 'phone'=>$phone ];
+        $newId = $pdo->lastInsertId();
+        error_log("User created successfully with ID: $newId");
+        $_SESSION['user'] = [ 'id'=>$newId, 'username'=>$username, 'role'=>$role, 'full_name'=>$full_name, 'phone'=>$phone ];
+        error_log("Session set, redirecting to /admin/");
         header('Location: ' . $base . '/admin/');
         exit;
       }
     } catch (Throwable $e) {
-      $error = 'Registration failed.';
+      $error = 'Registration failed: ' . $e->getMessage();
+      error_log("Registration exception: " . $e->getMessage());
     }
   }
 }
