@@ -13,11 +13,6 @@ if (basename($base) === 'admin') {
   $base = rtrim(dirname($base), '/\\');
 }
 
-if (!isset($_SESSION['user']) || ($_SESSION['user']['role'] ?? '') !== 'admin') {
-  header('Location: ' . $base . '/admin/login.php');
-  exit;
-}
-
 $modes = ['admin','staff'];
 $role = $_POST['role'] ?? ($_GET['mode'] ?? 'staff');
 if (!in_array($role, $modes, true)) { $role = 'staff'; }
