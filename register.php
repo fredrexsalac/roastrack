@@ -62,7 +62,7 @@ include __DIR__ . '/partials/header.php';
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <div class="text-center mb-2">
-          <img src="<?= ($base ?: '/') ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
+          <img src="<?= $base ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
         </div>
         <h4 class="mb-3 text-center">Sign up as a Customer</h4>
         <?php if ($error): ?><div class="alert alert-danger py-2"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
