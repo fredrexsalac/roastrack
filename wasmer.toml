@@ -9,3 +9,10 @@ php = "8.3"
 [deployment]
 workdir = "."
 command = "php -S 0.0.0.0:8080 index.php"
+
+[env]
+DB_HOST = "db.fr-pari1.bengt.wasmernet.com"
+DB_PORT = "10272"
+DB_NAME = "dbGYAEJgAMVLVyTLYzsaxDY4"
+DB_USER = "2763a0937989800053e31a4c3879"
+DB_PASS = "06922763-a094-7810-8000-8919c5ec5392"
