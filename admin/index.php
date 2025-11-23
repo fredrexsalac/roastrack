@@ -87,7 +87,7 @@ include __DIR__ . '/../partials/header.php';
   </aside>
   <section class="admin-content">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h4 class="mb-0">Admin Dashboard</h4>
+      <h4 class="mb-0"><?= (($_SESSION['user']['role'] ?? '') === 'admin') ? 'Admin Dashboard' : 'Staff Dashboard' ?></h4>
       <div>
         <a class="btn btn-sm btn-outline-light" href="<?= rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\') ?: '/' ?>/">Home</a>
       </div>
