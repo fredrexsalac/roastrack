@@ -1,13 +1,22 @@
 <?php
 session_start();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // points to site root
-if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)){
-  header('Location: ' . ($base ?: '/') . '/admin/login.php');
-  exit;
-}
-
 require_once __DIR__ . '/../db.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
+$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
+
+if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)) {
+  header('Location: ' . $base . '/admin/login.php');
+  exit;
+}
 
 // Simple stats
 $stats = [
@@ -65,10 +74,10 @@ include __DIR__ . '/../partials/header.php';
       <strong>RoastRack</strong>
     </div>
     <nav class="nav flex-column">
-      <a class="nav-link" href="<?= ($base ?: '/') ?>/"><i class="bi bi-house me-1"></i> Home</a>
+      <a class="nav-link" href="<?= $base ?>/"><i class="bi bi-house me-1"></i> Home</a>
       <a class="nav-link" href="inventory.php"><i class="bi bi-box-seam me-1"></i> Inventory</a>
       <?php if (in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)): ?>
-      <a class="nav-link" href="<?= ($base ?: '/') ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
+      <a class="nav-link" href="<?= $base ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
       <?php endif; ?>
       <?php if (($_SESSION['user']['role'] ?? '') === 'admin'): ?>
       <a class="nav-link" href="customers.php"><i class="bi bi-people me-1"></i> Customers</a>
@@ -128,7 +137,7 @@ include __DIR__ . '/../partials/header.php';
             <h5 class="card-title">Reservation Queue</h5>
             <p class="text-muted">Manage pickup schedule and statuses.</p>
             <?php if (in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)): ?>
-              <a class="btn btn-primary" href="<?= ($base ?: '/') ?>/queue.php">Open Queue</a>
+              <a class="btn btn-primary" href="<?= $base ?>/queue.php">Open Queue</a>
             <?php endif; ?>
           </div>
         </div>

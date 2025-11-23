@@ -1,8 +1,20 @@
 <?php
 session_start();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\');
+require_once __DIR__ . '/../db.php';
+$pdo = db();
+
+// Base path for links when hosted under a subfolder
+$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
+
 if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)){
-  header('Location: ' . ($base ?: '/') . '/admin/login.php');
+  header('Location: ' . $base . '/admin/login.php');
   exit;
 }
 require_once __DIR__ . '/../db.php';
@@ -53,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
           $fname = 'item_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . strtolower($ext);
           $dest = $dir . '/' . $fname;
           if (@move_uploaded_file($_FILES['image']['tmp_name'], $dest)){
-            $imagePath = (($base ?: '/') . '/uploads/items/' . $fname);
+            $imagePath = ($base . '/uploads/items/' . $fname);
           }
         }
       }
@@ -83,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
           $fname = 'item_' . time() . '_' . bin2hex(random_bytes(4)) . '.' . strtolower($ext);
           $dest = $dir . '/' . $fname;
           if (@move_uploaded_file($_FILES['image']['tmp_name'], $dest)){
-            $imagePath = (($base ?: '/') . '/uploads/items/' . $fname);
+            $imagePath = ($base . '/uploads/items/' . $fname);
           }
         }
       }
@@ -162,7 +174,7 @@ include __DIR__ . '/../partials/header.php';
     <nav class="nav flex-column">
       <a class="nav-link" href="index.php"><i class="bi bi-house me-1"></i> Home</a>
       <a class="nav-link active" href="inventory.php"><i class="bi bi-box-seam me-1"></i> Inventory</a>
-      <a class="nav-link" href="<?= ($base ?: '/') ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
+      <a class="nav-link" href="<?= $base ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
       <?php if ($isAdmin): ?>
       <a class="nav-link" href="customers.php"><i class="bi bi-people me-1"></i> Customers</a>
       <a class="nav-link" href="staff.php"><i class="bi bi-person-badge me-1"></i> Staff</a>

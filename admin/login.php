@@ -2,7 +2,16 @@
 session_start();
 require_once __DIR__ . '/../db.php';
 $pdo = db();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // points to site root
+
+// Base path for links when hosted under a subfolder
+$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 $modes = ['admin','staff'];
 $mode = $_POST['mode'] ?? 'admin';
@@ -26,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         'phone' => $user['phone'] ?? null,
         'role' => $user['role']
       ];
-      header('Location: ' . ($base ?: '/') . '/admin/');
+      header('Location: ' . $base . '/admin/');
       exit;
     } else {
       $error = 'Invalid ' . ($mode === 'admin' ? 'admin' : 'staff') . ' credentials.';
@@ -54,7 +63,7 @@ include __DIR__ . '/../partials/header.php';
     <div class="card shadow-sm bbq-card">
       <div class="card-body p-4">
         <div class="d-flex justify-content-center mb-2">
-          <img src="<?= ($base ?: '/') ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
+          <img src="<?= $base ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
         </div>
         <div class="text-center mb-2"><span class="bbq-badge"><i class="bi bi-shield-lock me-1"></i> Admin Access</span></div>
         <div class="d-flex justify-content-center gap-2 mb-3" id="loginModeSwitch">
@@ -77,7 +86,7 @@ include __DIR__ . '/../partials/header.php';
             <input type="password" class="form-control" name="password" autocomplete="current-password" />
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <a href="<?= ($base ?: '/') ?>/admin/register.php">Register admin/staff</a>
+            <a href="<?= $base ?>/admin/register.php">Register admin/staff</a>
             <button class="btn btn-primary">Login</button>
           </div>
         </form>
