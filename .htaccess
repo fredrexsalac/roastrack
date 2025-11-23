@@ -1,0 +1,15 @@
+RewriteEngine On
+
+# Hide .php extension
+RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
+RewriteRule ^ /%1 [NC,L,R=301]
+
+# Internally rewrite clean URLs to .php files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# Handle admin directory
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^admin/([^\.]+)$ admin/$1.php [NC,L]
