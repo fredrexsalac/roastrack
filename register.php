@@ -2,8 +2,16 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
-// Base for redirects when hosted under subfolder
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -80,7 +88,7 @@ include __DIR__ . '/partials/header.php';
             <input type="password" class="form-control" name="password" autocomplete="new-password" />
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <a href="<?= ($base ?: '/') ?>/login.php">Have an account? Login</a>
+            <a href="<?= $base ?>/login.php">Have an account? Login</a>
             <button class="btn btn-primary">Create account</button>
           </div>
         </form>
