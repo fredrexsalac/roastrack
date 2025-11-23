@@ -31,15 +31,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
       if (!$user || !password_verify($password, $user['password_hash'])){
         $error = 'Invalid credentials.';
       } else {
-      $_SESSION['user'] = [
-        'id'=>$user['id'],
-        'username'=>$user['username'],
-        'full_name'=>$user['full_name'] ?? null,
-        'phone'=>$user['phone'] ?? null,
-        'role'=>$user['role']
-      ];
-      header('Location: ' . ($base ?: '/') . '/');
-      exit;
+        $_SESSION['user'] = [
+          'id'=>$user['id'],
+          'username'=>$user['username'],
+          'full_name'=>$user['full_name'] ?? null,
+          'phone'=>$user['phone'] ?? null,
+          'role'=>$user['role']
+        ];
+        header('Location: ' . ($base ?: '/') . '/');
+        exit;
+      }
     } catch (Throwable $e) {
       error_log("Database error during login: " . $e->getMessage());
       $error = 'Login system error. Please try again.';
