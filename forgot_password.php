@@ -27,18 +27,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
     
     if ($user) {
-      // Generate a simple reset token (in production, use email and more secure method)
-      $reset_token = bin2hex(random_bytes(16));
+      // Generate a secure reset token
+      $reset_token = bin2hex(random_bytes(32));
       $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
       
-      // Store reset token in session (simplified approach)
-      $_SESSION['reset_token'] = $reset_token;
-      $_SESSION['reset_user_id'] = $user['id'];
-      $_SESSION['reset_expiry'] = $expiry;
+      // Store reset token in database
+      $stmt = $pdo->prepare('UPDATE users SET reset_token = ?, reset_expiry = ? WHERE id = ?');
+      $stmt->execute([$reset_token, $expiry, $user['id']]);
       
-      $message = "Password reset link created! For demo purposes, the reset token is: <strong>$reset_token</strong><br>
-                  In production, this would be sent via email.<br>
-                  <a href='$base/reset_password.php?token=$reset_token'>Click here to reset password</a>";
+      // Send email
+      $reset_link = "https://roastrack-barbecue.wasmer.app/reset_password.php?token=" . $reset_token;
+      $subject = "Password Reset - RoastRack";
+      $message = "Hello {$user['full_name']},\n\n";
+      $message .= "You requested a password reset for your RoastRack account.\n\n";
+      $message .= "Click this link to reset your password:\n";
+      $message .= $reset_link . "\n\n";
+      $message .= "This link will expire in 1 hour.\n\n";
+      $message .= "If you didn't request this, please ignore this email.\n\n";
+      $message .= "RoastRack Team";
+      
+      $headers = "From: noreply@roastrack-barbecue.wasmer.app\r\n";
+      $headers .= "Reply-To: noreply@roastrack-barbecue.wasmer.app\r\n";
+      $headers .= "X-Mailer: PHP/" . phpversion();
+      
+      // Get user email
+      $email_stmt = $pdo->prepare('SELECT email FROM users WHERE id = ?');
+      $email_stmt->execute([$user['id']]);
+      $user_email = $email_stmt->fetchColumn();
+      
+      if ($user_email && mail($user_email, $subject, $message, $headers)) {
+        $message = "Password reset link has been sent to your email address.";
+      } else {
+        $error = "Unable to send email. Please contact support or check if your email is on file.";
+      }
     } else {
       // Don't reveal if user exists or not
       $message = "If the username exists, a reset link has been generated.";

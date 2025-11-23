@@ -2,11 +2,20 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 // Allow admin or staff, require auth
 if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)){
-  header('Location: ' . ($base ?: '/') . '/admin/login.php');
+  header('Location: ' . $base . '/admin/login.php');
   exit;
 }
 
@@ -19,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['res_id'], $_POST['act
     $upd = $pdo->prepare('UPDATE reservations SET status=? WHERE id=?');
     $upd->execute([$action, $resId]);
   }
-  header('Location: ' . ($base ?: '/') . '/queue.php');
+  header('Location: ' . $base . '/queue.php');
   exit;
 }
 
@@ -61,7 +70,7 @@ include __DIR__ . '/partials/header.php';
 </div>
 
 <div class="mb-3">
-  <a class="btn btn-sm btn-outline-secondary rr-back-btn" href="<?= ($base ?: '/') ?>/admin/">&larr; Back to Dashboard</a>
+  <a class="btn btn-sm btn-outline-secondary rr-back-btn" href="<?= $base ?>/admin/">&larr; Back to Dashboard</a>
   </div>
 
 <?php if (!$reservations): ?>

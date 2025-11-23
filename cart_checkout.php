@@ -1,25 +1,31 @@
 <?php
 session_start();
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/helpers/cart_helpers.php';
-require_once __DIR__ . '/helpers/gcash_accounts.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-if ($base === '' || $base === '/' || $base === '\\') { $base = ''; }
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 if (!isset($_SESSION['user'])) {
-  header('Location: ' . ($base ?: '/') . '/login.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
 $cart = rr_get_cart();
-if (!$cart) {
-  header('Location: ' . ($base ?: '/') . '/catalog.php?msg=' . urlencode('Your cart is empty.'));
+if (empty($cart)) {
+  header('Location: ' . $base . '/catalog.php?msg=' . urlencode('Your cart is empty.'));
   exit;
 }
 
 $gcashAccounts = gcash_get_accounts($pdo);
-$gcashLogoUrl = ($base ?: '/') . '/assets/payment-img/gcash.jpg';
+$gcashLogoUrl = $base . '/assets/payment-img/gcash.jpg';
 
 function rr_checkout_items(PDO $pdo, array $cart): array {
   $items = [];
@@ -48,7 +54,7 @@ function rr_checkout_items(PDO $pdo, array $cart): array {
 [$cartItems, $cartTotal] = rr_checkout_items($pdo, $cart);
 if (!$cartItems) {
   rr_cart_clear();
-  header('Location: ' . ($base ?: '/') . '/catalog.php?msg=' . urlencode('Items in your cart are no longer available. Please add them again.'));
+  header('Location: ' . $base . '/catalog.php?msg=' . urlencode('Items in your cart are no longer available. Please add them again.'));
   exit;
 }
 
@@ -113,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!move_uploaded_file($tmp, $dest)) {
           $errors[] = 'Failed to save GCash proof.';
         } else {
-          $gcash_proof_path = ($base ?: '/') . '/uploads/' . $fname;
+          $gcash_proof_path = $base . '/uploads/' . $fname;
         }
       }
     }
@@ -156,7 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       $pdo->commit();
       rr_cart_clear();
-      header('Location: ' . ($base ?: '/') . '/reserve_success.php?id=' . $resId);
+      header('Location: ' . $base . '/reserve_success.php?id=' . $resId);
       exit;
     } catch (Throwable $e) {
       $pdo->rollBack();

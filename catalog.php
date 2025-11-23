@@ -4,6 +4,16 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/helpers/cart_helpers.php';
 $pdo = db();
 
+// Base path for links when hosted under a subfolder
+$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
+
 // Detect if inventory_items has image_path column so we can display uploaded photos
 $hasImageCol = false;
 try {
@@ -20,7 +30,7 @@ $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $action = $_POST['action'] ?? '';
   if (!isset($_SESSION['user'])) {
-    header('Location: ' . ($base ?? '/') . '/login.php');
+    header('Location: ' . $base . '/login.php');
     exit;
   }
   if ($action === 'add' && isset($_POST['item_id'])) {

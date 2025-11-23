@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
           'phone'=>$user['phone'] ?? null,
           'role'=>$user['role']
         ];
-        header('Location: ' . ($base ?: '/') . '/');
+        header('Location: ' . $base . '/');
         exit;
       }
     } catch (Throwable $e) {

@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         $ins = $pdo->prepare('INSERT INTO users (username, password_hash, role, full_name, phone, email) VALUES (?,?,?,?,?,?)');
         $ins->execute([$username, $hash, $role, $full_name, $phone, $email ?: null]);
         $_SESSION['user'] = [ 'id'=>$pdo->lastInsertId(), 'username'=>$username, 'role'=>$role ];
-        header('Location: ' . ($base ?: '/') . '/');
+        header('Location: ' . $base . '/');
         exit;
       }
     } catch (Throwable $e) {
