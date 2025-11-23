@@ -10,7 +10,7 @@ function db(): PDO {
   $port = getenv('DB_PORT') ?: '10272';
   $db   = getenv('DB_NAME') ?: 'dbGYAEJgAMVLVyTLYzsaxDY4';
   $user = getenv('DB_USER') ?: '2763a0937989800053e31a4c3879';
-  $pass = getenv('DB_PASS') ?: '06922763-a094-7810-8000-8919c5ec5392';
+  $pass = getenv('DB_PASS') ?: '06921f50-3aaa-7958-8000-9e75d554b5bb';
   $charset = 'utf8mb4';
 
   $dsn = "mysql:host={$host};port={$port};dbname={$db};charset={$charset}";
