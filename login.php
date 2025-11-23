@@ -4,6 +4,9 @@ require_once __DIR__ . '/db.php';
 $pdo = db();
 // Base for redirects when hosted under subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '/' || $base === '\\' || $base === '.') {
+  $base = '';
+}
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -69,12 +72,12 @@ include __DIR__ . '/partials/header.php';
             <input type="password" class="form-control" name="password" autocomplete="current-password" />
           </div>
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <a href="<?= ($base ?: '/') ?>/register.php">Create account</a>
+            <a href="<?= $base ?>/register.php">Create account</a>
             <button class="btn btn-primary"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
           </div>
           <div class="divider mb-3"><span>or</span></div>
           <div class="text-center">
-            <a class="btn btn-outline-secondary w-100" href="<?= ($base ?: '/') ?>/google_login.php">
+            <a class="btn btn-outline-secondary w-100" href="<?= $base ?>/google_login.php">
               <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" height="18" class="google-icon" alt="Google"/>
               Continue with Google
             </a>

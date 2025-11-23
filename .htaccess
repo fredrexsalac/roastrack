@@ -4,12 +4,14 @@ RewriteEngine On
 RewriteCond %{THE_REQUEST} /([^.]+)\.php [NC]
 RewriteRule ^ /%1 [NC,L,R=301]
 
-# Internally rewrite clean URLs to .php files
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^([^\.]+)$ $1.php [NC,L]
+RewriteRule ^admin/?$ admin/index.php [NC,L]
 
-# Handle admin directory
+# Clean URLs for root-level pages (allow optional trailing slash)
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^admin/([^\.]+)$ admin/$1.php [NC,L]
+RewriteRule ^([^/]+)/?$ $1.php [NC,L]
+
+# Handle admin directory (allow optional trailing slash)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^admin/([^/]+)/?$ admin/$1.php [NC,L]
