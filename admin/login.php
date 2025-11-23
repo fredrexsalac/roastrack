@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../db.php';
 $pdo = db();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // /Delivery/public
+$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // points to site root
 
 $modes = ['admin','staff'];
 $mode = $_POST['mode'] ?? 'admin';

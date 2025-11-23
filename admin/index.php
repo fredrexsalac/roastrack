@@ -1,6 +1,6 @@
 <?php
 session_start();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // /Delivery/public
+$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\'); // points to site root
 if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)){
   header('Location: ' . ($base ?: '/') . '/admin/login.php');
   exit;
