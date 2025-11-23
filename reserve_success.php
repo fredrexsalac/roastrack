@@ -2,11 +2,20 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if ($id <= 0) {
-  header('Location: ' . ($base ?: '/') . '/catalog.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
@@ -18,7 +27,7 @@ $stmt = $pdo->prepare('SELECT r.id, r.pickup_at, r.status, COALESCE(u.username, 
 $stmt->execute([$id]);
 $res = $stmt->fetch();
 if (!$res) {
-  header('Location: ' . ($base ?: '/') . '/catalog.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
@@ -26,7 +35,7 @@ $items = $pdo->prepare('SELECT item_name, qty FROM reservation_items WHERE reser
 $items->execute([$id]);
 $list = $items->fetchAll();
 
-$beepAsset = ($base ?: '/') . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3';
+$beepAsset = $base . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3';
 
 include __DIR__ . '/partials/header.php';
 ?>
@@ -56,7 +65,7 @@ include __DIR__ . '/partials/header.php';
             <li><?= htmlspecialchars($row['item_name']) ?> × <?= (int)$row['qty'] ?></li>
           <?php endforeach; ?>
         </ul>
-        <a class="btn btn-primary" href="<?= ($base ?: '/') ?>/catalog.php">Back to Catalog</a>
+        <a class="btn btn-primary" href="<?= $base ?>/catalog.php">Back to Catalog</a>
       </div>
     </div>
   </div>
@@ -72,7 +81,7 @@ include __DIR__ . '/partials/header.php';
   let notified = false;
   async function poll(){
     try {
-      const r = await fetch('<?= ($base ?: '/') ?>/reservation_status.php?id=' + id);
+      const r = await fetch('<?= $base ?>/reservation_status.php?id=' + id);
       const j = await r.json();
       if (j && j.status) {
         badge.textContent = j.status;

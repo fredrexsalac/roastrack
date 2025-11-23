@@ -2,20 +2,29 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 $configPath = __DIR__ . '/google_oauth.php';
 if (!file_exists($configPath)) { $configPath = __DIR__ . '/google_oauth.sample.php'; }
 $cfg = require $configPath;
 
 if (isset($_GET['error'])){
-  header('Location: ' . ($base ?: '/') . '/login.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
 $code = $_GET['code'] ?? '';
 if ($code === ''){
-  header('Location: ' . ($base ?: '/') . '/login.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
@@ -26,8 +35,9 @@ $post = [
   'client_id' => $cfg['client_id'],
   'client_secret' => $cfg['client_secret'],
   'redirect_uri' => $cfg['redirect_uri'],
-  'grant_type' => 'authorization_code'
+  'grant_type' => 'authorization_code',
 ];
+
 $ch = curl_init($tokenUrl);
 curl_setopt_array($ch, [
   CURLOPT_RETURNTRANSFER => true,
@@ -38,10 +48,10 @@ curl_setopt_array($ch, [
 $resp = curl_exec($ch);
 $err = curl_error($ch);
 curl_close($ch);
-if ($err || !$resp){ header('Location: ' . ($base ?: '/') . '/login.php'); exit; }
+if ($err || !$resp){ header('Location: ' . $base . '/login.php'); exit; }
 $tok = json_decode($resp, true);
 $access = $tok['access_token'] ?? null;
-if (!$access){ header('Location: ' . ($base ?: '/') . '/login.php'); exit; }
+if (!$access){ header('Location: ' . $base . '/login.php'); exit; }
 
 // 2) Get userinfo
 $ch = curl_init('https://openidconnect.googleapis.com/v1/userinfo');
@@ -52,7 +62,7 @@ curl_setopt_array($ch, [
 $uinfo = curl_exec($ch);
 $err = curl_error($ch);
 curl_close($ch);
-if ($err || !$uinfo){ header('Location: ' . ($base ?: '/') . '/login.php'); exit; }
+if ($err || !$uinfo){ header('Location: ' . $base . '/login.php'); exit; }
 $u = json_decode($uinfo, true);
 $googleId = $u['sub'] ?? null;
 $email = $u['email'] ?? '';
@@ -67,16 +77,9 @@ try {
   $existing = $stmt->fetch();
 } catch (Throwable $e) {
   $hasGoogleId = false;
-  $existing = null;
-}
-
-if (!$existing && $email){
-  // Try by email if google_id not present or not matched
-  try {
-    $stmt = $pdo->prepare('SELECT id, username, full_name, phone, role FROM users WHERE email = ?');
-    $stmt->execute([$email]);
-    $existing = $stmt->fetch();
-  } catch (Throwable $e) { /* ignore */ }
+  $stmt = $pdo->prepare('SELECT id, username, full_name, phone, role FROM users WHERE username = ?');
+  $stmt->execute([$username]);
+  $existing = $stmt->fetch();
 }
 
 if ($existing){
@@ -87,7 +90,7 @@ if ($existing){
     'phone'=>$existing['phone'] ?? null,
     'role'=>$existing['role'] ?? 'customer'
   ];
-  header('Location: ' . ($base ?: '/') . '/catalog.php');
+  header('Location: ' . $base . '/catalog.php');
   exit;
 }
 
@@ -102,9 +105,10 @@ try {
   }
   $uid = (int)$pdo->lastInsertId();
   $_SESSION['user'] = [ 'id'=>$uid, 'username'=>$username, 'full_name'=>$name ?: $username, 'phone'=>null, 'role'=>'customer' ];
-  header('Location: ' . ($base ?: '/') . '/catalog.php');
+  header('Location: ' . $base . '/catalog.php');
   exit;
 } catch (Throwable $e) {
-  header('Location: ' . ($base ?: '/') . '/login.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
+?>

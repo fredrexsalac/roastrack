@@ -1,8 +1,20 @@
 <?php
 session_start();
-$base = rtrim(dirname(dirname($_SERVER['SCRIPT_NAME'])), '/\\');
-if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)){
-  header('Location: ' . ($base ?: '/') . '/admin/login.php');
+require_once __DIR__ . '/../db.php';
+$pdo = db();
+
+// Base path for links when hosted under a subfolder
+$base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
+
+if (!isset($_SESSION['user']) || !in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)) {
+  header('Location: ' . $base . '/admin/login.php');
   exit;
 }
 require_once __DIR__ . '/../db.php';
@@ -50,7 +62,7 @@ include __DIR__ . '/../partials/header.php';
       <a class="nav-link" href="index.php"><i class="bi bi-house me-1"></i> Home</a>
       <a class="nav-link" href="inventory.php"><i class="bi bi-box-seam me-1"></i> Inventory</a>
       <?php if (in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)): ?>
-      <a class="nav-link" href="<?= ($base ?: '/') ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
+      <a class="nav-link" href="<?= $base ?>/queue.php"><i class="bi bi-receipt me-1"></i> Orders</a>
       <?php endif; ?>
       <a class="nav-link active" href="customers.php"><i class="bi bi-people me-1"></i> Customers</a>
       <a class="nav-link" href="staff.php"><i class="bi bi-person-badge me-1"></i> Staff</a>

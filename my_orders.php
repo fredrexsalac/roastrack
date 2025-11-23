@@ -2,23 +2,27 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-if ($base === '' || $base === '/' || $base === '\\') {
+if ($base === '.' || $base === '\\') {
   $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
 }
 
 if (!isset($_SESSION['user'])) {
-  header('Location: ' . ($base ?: '/') . '/login.php?msg=' . urlencode('Please log in to view your orders.'));
+  header('Location: ' . $base . '/login.php?msg=' . urlencode('Please log in to view your orders.'));
+  exit;
+}
+if (in_array(($_SESSION['user']['role'] ?? ''), ['admin','staff'], true)) {
+  header('Location: ' . $base . '/admin/');
   exit;
 }
 
 $user = $_SESSION['user'];
-$isStaff = in_array(($user['role'] ?? ''), ['admin','staff'], true);
-if ($isStaff) {
-  header('Location: ' . ($base ?: '/') . '/admin/');
-  exit;
-}
-
 $userId = $user['id'];
 $activeStatuses = ['PENDING','CONFIRMED','IN_PROCESS','READY'];
 $statusBadges = [
@@ -56,7 +60,7 @@ $watchReservations = array_values(array_filter($reservations, function($row) {
 $pollPayload = array_map(function($row) {
   return ['id' => (int)$row['id'], 'status' => $row['status']];
 }, $watchReservations);
-$readySoundSrc = ($base ?: '/') . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3';
+$readySoundSrc = $base . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3';
 
 include __DIR__ . '/partials/header.php';
 ?>
@@ -128,7 +132,7 @@ include __DIR__ . '/partials/header.php';
   (function(){
     const pollTargets = <?= json_encode($pollPayload, JSON_UNESCAPED_SLASHES) ?>;
     if (!pollTargets.length) return;
-    const baseUrl = <?= json_encode($base ?: '/') ?>;
+    const baseUrl = <?= json_encode($base) ?>;
     const statusMessages = <?= json_encode($statusMessages, JSON_UNESCAPED_SLASHES) ?>;
     const statusBadges = <?= json_encode($statusBadges, JSON_UNESCAPED_SLASHES) ?>;
     const audio = document.getElementById('orderReadyAudio');

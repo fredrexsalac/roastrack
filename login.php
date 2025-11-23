@@ -15,21 +15,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
   if ($username === '' || $password === ''){
     $error = 'Username and password are required.';
   } else {
-    $stmt = $pdo->prepare('SELECT id, username, full_name, phone, password_hash, role FROM users WHERE username = ?');
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-    if (!$user || !password_verify($password, $user['password_hash'])){
-      $error = 'Invalid credentials.';
-    } else {
-      $_SESSION['user'] = [
-        'id'=>$user['id'],
-        'username'=>$user['username'],
-        'full_name'=>$user['full_name'] ?? null,
-        'phone'=>$user['phone'] ?? null,
-        'role'=>$user['role']
-      ];
-      header('Location: ' . ($base ?: '/') . '/');
-      exit;
+    try {
+      $stmt = $pdo->prepare('SELECT id, username, full_name, phone, password_hash, role FROM users WHERE username = ?');
+      $stmt->execute([$username]);
+      $user = $stmt->fetch();
+      
+      // Debug: Log what we found
+      error_log("Login attempt for username: '$username'");
+      error_log("User found: " . ($user ? 'YES' : 'NO'));
+      if ($user) {
+        error_log("Stored hash: " . $user['password_hash']);
+        error_log("Password verify result: " . (password_verify($password, $user['password_hash']) ? 'SUCCESS' : 'FAILED'));
+      }
+      
+      if (!$user || !password_verify($password, $user['password_hash'])){
+        $error = 'Invalid credentials.';
+      } else {
+        $_SESSION['user'] = [
+          'id'=>$user['id'],
+          'username'=>$user['username'],
+          'full_name'=>$user['full_name'] ?? null,
+          'phone'=>$user['phone'] ?? null,
+          'role'=>$user['role']
+        ];
+        header('Location: ' . $base . '/');
+        exit;
+      }
+    } catch (Throwable $e) {
+      error_log("Database error during login: " . $e->getMessage());
+      $error = 'Login system error. Please try again.';
     }
   }
 }
@@ -71,9 +85,12 @@ include __DIR__ . '/partials/header.php';
             <label class="form-label">Password</label>
             <input type="password" class="form-control" name="password" autocomplete="current-password" />
           </div>
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex justify-content-between align-items-center">
             <a href="<?= $base ?>/register.php">Create account</a>
-            <button class="btn btn-primary"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
+            <a href="<?= $base ?>/forgot_password.php">Forgot password?</a>
+          </div>
+          <div class="text-center mt-2">
+            <button class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
           </div>
           <div class="divider mb-3"><span>or</span></div>
           <div class="text-center">

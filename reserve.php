@@ -1,19 +1,27 @@
 <?php
 session_start();
 require_once __DIR__ . '/db.php';
-require_once __DIR__ . '/helpers/gcash_accounts.php';
 $pdo = db();
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 // Require login
 if (!isset($_SESSION['user'])){
-  header('Location: ' . ($base ?: '/') . '/login.php');
+  header('Location: ' . $base . '/login.php');
   exit;
 }
 
 $itemId = isset($_GET['item']) ? (int)$_GET['item'] : 0;
 if ($itemId <= 0) {
-  header('Location: ' . ($base ?: '/') . '/catalog.php?msg=' . urlencode('Select an item to reserve.'));
+  header('Location: ' . $base . '/catalog.php?msg=' . urlencode('Select an item to reserve.'));
   exit;
 }
 
@@ -21,12 +29,12 @@ $stmt = $pdo->prepare('SELECT id, name, description, unit_price FROM inventory_i
 $stmt->execute([$itemId]);
 $item = $stmt->fetch();
 if (!$item) {
-  header('Location: ' . ($base ?: '/') . '/catalog.php?msg=' . urlencode('Item not found.'));
+  header('Location: ' . $base . '/catalog.php?msg=' . urlencode('Item not found.'));
   exit;
 }
 
 $gcashAccounts = gcash_get_accounts($pdo);
-$gcashLogoUrl = ($base ?: '/') . '/assets/payment-img/gcash.jpg';
+$gcashLogoUrl = $base . '/assets/payment-img/gcash.jpg';
 $hasGcashAccounts = !empty($gcashAccounts);
 $minPickup = (new DateTime('+15 minutes'))->format('Y-m-d\TH:i');
 $maxPickup = (new DateTime('+3 days'))->format('Y-m-d\TH:i');
@@ -71,7 +79,7 @@ include __DIR__ . '/partials/header.php';
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <h4 class="mb-3">Reserve for pickup</h4>
-        <form method="post" action="<?= ($base ?: '/') ?>/reserve_submit.php" enctype="multipart/form-data">
+        <form method="post" action="<?= $base ?>/reserve_submit.php" enctype="multipart/form-data">
           <input type="hidden" name="item_id" value="<?= (int)$item['id'] ?>" />
           <div class="mb-3">
             <label class="form-label">Item</label>
@@ -139,7 +147,7 @@ include __DIR__ . '/partials/header.php';
             <textarea class="form-control" name="notes" rows="2" placeholder="No spicy, extra sauce, etc."></textarea>
           </div>
           <div class="d-flex justify-content-between">
-            <a class="btn btn-outline-secondary" href="<?= ($base ?: '/') ?>/catalog.php">Back to catalog</a>
+            <a class="btn btn-outline-secondary" href="<?= $base ?>/catalog.php">Back to catalog</a>
             <button class="btn btn-primary">Place reservation</button>
           </div>
         </form>

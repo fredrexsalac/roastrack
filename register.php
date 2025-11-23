@@ -2,8 +2,16 @@
 session_start();
 require_once __DIR__ . '/db.php';
 $pdo = db();
-// Base for redirects when hosted under subfolder
+
+// Base path for links when hosted under a subfolder
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+if ($base === '.' || $base === '\\') {
+  $base = '';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /public
+if (basename($base) === 'admin') {
+  $base = rtrim(dirname($base), '/\\');
+}
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -27,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
         $ins = $pdo->prepare('INSERT INTO users (username, password_hash, role, full_name, phone, email) VALUES (?,?,?,?,?,?)');
         $ins->execute([$username, $hash, $role, $full_name, $phone, $email ?: null]);
         $_SESSION['user'] = [ 'id'=>$pdo->lastInsertId(), 'username'=>$username, 'role'=>$role ];
-        header('Location: ' . ($base ?: '/') . '/');
+        header('Location: ' . $base . '/');
         exit;
       }
     } catch (Throwable $e) {
@@ -54,7 +62,7 @@ include __DIR__ . '/partials/header.php';
     <div class="card shadow-sm">
       <div class="card-body p-4">
         <div class="text-center mb-2">
-          <img src="<?= ($base ?: '/') ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
+          <img src="<?= $base ?>/images/roastrack.png" alt="RoastRack" width="96" height="96" class="logo-tilt"/>
         </div>
         <h4 class="mb-3 text-center">Sign up as a Customer</h4>
         <?php if ($error): ?><div class="alert alert-danger py-2"><?php echo htmlspecialchars($error); ?></div><?php endif; ?>
@@ -80,7 +88,7 @@ include __DIR__ . '/partials/header.php';
             <input type="password" class="form-control" name="password" autocomplete="new-password" />
           </div>
           <div class="d-flex justify-content-between align-items-center">
-            <a href="<?= ($base ?: '/') ?>/login.php">Have an account? Login</a>
+            <a href="<?= $base ?>/login.php">Have an account? Login</a>
             <button class="btn btn-primary">Create account</button>
           </div>
         </form>
