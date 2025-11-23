@@ -1,0 +1,11 @@
+[package]
+name = "roastrack"
+version = "1.0.0"
+description = "RoastRack PHP app"
+
+[dependencies]
+php = "8.3"
+
+[deployment]
+workdir = "."
+command = "php -S 0.0.0.0:8080 index.php"
