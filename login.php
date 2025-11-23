@@ -54,7 +54,7 @@ include __DIR__ . '/partials/header.php';
     <div class="card shadow-sm bbq-card">
       <div class="card-body p-4">
         <div class="d-flex justify-content-center mb-2">
-          <img src="<?= ($base ?: '/') ?>/images/roastrack.png" alt="RoastRack" width="110" height="110" class="logo-tilt"/>
+          <img src="<?= $base ?>/images/roastrack.png" alt="RoastRack" width="110" height="110" class="logo-tilt"/>
         </div>
         <div class="text-center mb-2"><span class="bbq-badge"><i class="bi bi-fire me-1"></i> Fresh off the grill</span></div>
         <h3 class="mb-1 text-center bbq-title">Login to Proceed</h3>

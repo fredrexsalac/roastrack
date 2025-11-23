@@ -33,9 +33,9 @@ $isStaffUser = isset($_SESSION['user']) && in_array(($currentRole ?? ''), ['admi
 $shouldInjectCustomerAlerts = isset($_SESSION['user']) && !$isStaffUser && !$isAdminArea && !$isQueuePage;
 if ($shouldInjectCustomerAlerts) {
   $rrCustomerAlertConfig = [
-    'sound' => ($base ?: '/') . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3',
-    'endpoint' => ($base ?: '/') . '/reservation_alerts.php',
-    'icon' => ($base ?: '/') . '/images/roastrack.png',
+    'sound' => $base . '/assets/audio/Alarm%20Beeping%20Sound%20Effect.mp3',
+    'endpoint' => $base . '/reservation_alerts.php',
+    'icon' => $base . '/images/roastrack.png',
     'statusBadges' => [
       'PENDING' => 'secondary',
       'CONFIRMED' => 'primary',
