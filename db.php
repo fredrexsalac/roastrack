@@ -8,7 +8,7 @@ function db(): PDO {
 
   $host = getenv('DB_HOST') ?: 'db.fr-pari1.bengt.wasmernet.com';
   $port = getenv('DB_PORT') ?: '10272';
-  $db   = getenv('DB_NAME') ?: 'dbhQeyWKy3w75MzrX86oRDec';
+  $db   = getenv('DB_NAME') ?: 'dbGYAEJgAMVLVyTLYzsaxDY4';
   $user = getenv('DB_USER') ?: '1f503aaa78138000849f189a3aea';
   $pass = getenv('DB_PASS') ?: '06921f50-3aaa-7958-8000-9e75d554b5bb';
   $charset = 'utf8mb4';
