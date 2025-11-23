@@ -85,9 +85,12 @@ include __DIR__ . '/partials/header.php';
             <label class="form-label">Password</label>
             <input type="password" class="form-control" name="password" autocomplete="current-password" />
           </div>
-          <div class="d-flex justify-content-between align-items-center mb-3">
+          <div class="d-flex justify-content-between align-items-center">
             <a href="<?= $base ?>/register.php">Create account</a>
-            <button class="btn btn-primary"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
+            <a href="<?= $base ?>/forgot_password.php">Forgot password?</a>
+          </div>
+          <div class="text-center mt-2">
+            <button class="btn btn-primary w-100"><i class="bi bi-box-arrow-in-right me-1"></i>Login</button>
           </div>
           <div class="divider mb-3"><span>or</span></div>
           <div class="text-center">
