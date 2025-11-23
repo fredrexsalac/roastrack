@@ -15,12 +15,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
   if ($username === '' || $password === ''){
     $error = 'Username and password are required.';
   } else {
-    $stmt = $pdo->prepare('SELECT id, username, full_name, phone, password_hash, role FROM users WHERE username = ?');
-    $stmt->execute([$username]);
-    $user = $stmt->fetch();
-    if (!$user || !password_verify($password, $user['password_hash'])){
-      $error = 'Invalid credentials.';
-    } else {
+    try {
+      $stmt = $pdo->prepare('SELECT id, username, full_name, phone, password_hash, role FROM users WHERE username = ?');
+      $stmt->execute([$username]);
+      $user = $stmt->fetch();
+      
+      // Debug: Log what we found
+      error_log("Login attempt for username: '$username'");
+      error_log("User found: " . ($user ? 'YES' : 'NO'));
+      if ($user) {
+        error_log("Stored hash: " . $user['password_hash']);
+        error_log("Password verify result: " . (password_verify($password, $user['password_hash']) ? 'SUCCESS' : 'FAILED'));
+      }
+      
+      if (!$user || !password_verify($password, $user['password_hash'])){
+        $error = 'Invalid credentials.';
+      } else {
       $_SESSION['user'] = [
         'id'=>$user['id'],
         'username'=>$user['username'],
@@ -30,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
       ];
       header('Location: ' . ($base ?: '/') . '/');
       exit;
+    } catch (Throwable $e) {
+      error_log("Database error during login: " . $e->getMessage());
+      $error = 'Login system error. Please try again.';
     }
   }
 }
