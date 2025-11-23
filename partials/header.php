@@ -8,9 +8,13 @@ if (file_exists($cartHelpers)) {
 }
 // Base path for links when hosted under a subfolder like /delivery
 $base = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
-// If current script is inside /admin, lift base one level up so assets resolve from /public
-if (basename($base) === 'admin') {
-  $base = rtrim(dirname($base), '/\\');
+// If deployed at root, set base to '/'
+if ($base === '' || $base === '.' || $base === '\\') {
+  $base = '/';
+}
+// If current script is inside /admin, lift base one level up so assets resolve from /
+if (basename(dirname($_SERVER['SCRIPT_NAME'])) === 'admin') {
+  $base = '/';
 }
 $baseRoot = $base;
 if ($baseRoot === '' || $baseRoot === '/' || $baseRoot === '\\') {
